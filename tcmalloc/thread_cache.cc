@@ -260,6 +260,28 @@ void ThreadCache::InitTSD() {
   TC_ASSERT(!tsd_inited_);
   PerCpuState::state().Init();
   tsd_inited_ = true;
+
+  // This thread may have created its heap before TSD was available, so it was
+  // never installed.  Install it now, or the next allocation creates a second
+  // heap and the first one is stranded in thread_heaps_.
+  ThreadCache* heap = nullptr;
+  {
+    AllocationGuardSpinLockHolder l(threadcache_lock_);
+    const pthread_t me = pthread_self();
+    for (ThreadCache* h = thread_heaps_; h != nullptr; h = h->next_) {
+      if (pthread_equal(h->tid_, me) != 0) {
+        heap = h;
+        break;
+      }
+    }
+  }
+
+  if (heap != nullptr) {
+    heap->in_setspecific_ = true;
+    thread_local_data_ = heap;
+    PerCpuState::state().RegisterThreadCache(heap);
+    heap->in_setspecific_ = false;
+  }
 }
 
 ThreadCache* ThreadCache::CreateCacheIfNecessary() {

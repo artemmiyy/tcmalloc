@@ -241,6 +241,22 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "thread_cache_count_test",
+    srcs = ["thread_cache_count_test.cc"],
+    copts = TCMALLOC_DEFAULT_COPTS,
+    malloc = "//tcmalloc:tcmalloc_deprecated_perthread",
+    tags = [
+        "noasan",
+        "nomsan",
+        "notsan",
+    ],
+    deps = [
+        "//tcmalloc:malloc_extension",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 create_tcmalloc_testsuite(
     name = "memalign_test",
     srcs = ["memalign_test.cc"],

@@ -208,6 +208,20 @@ tcmalloc_cc_test(
     "tcmalloc::tcmalloc_deprecated_perthread"
 )
 
+tcmalloc_cc_test(
+  NAME
+    tcmalloc_testing_thread_cache_count_test
+  SRCS
+    "thread_cache_count_test.cc"
+  DEPS
+    "GTest::gtest_main"
+    "GTest::gmock_main"
+    "GTest::gmock"
+    "tcmalloc::common_deprecated_perthread"
+    "tcmalloc::malloc_extension"
+    "tcmalloc::tcmalloc_deprecated_perthread"
+)
+
 tcmalloc_cc_test_variants(
   NAME
     tcmalloc_testing_memalign_test
